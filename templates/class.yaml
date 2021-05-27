@@ -1,0 +1,10 @@
+#storage.k8s.io/v1
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: {{ .Values.class.name }}
+provisioner: {{ .Values.class.provisioner }}
+parameters:
+  archiveOnDelete: {{ quote .Values.class.archiveOnDelete }}
+
+

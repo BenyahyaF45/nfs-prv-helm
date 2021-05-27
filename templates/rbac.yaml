@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: {{ .Values.rbac.name }}
+---
+kind: ClusterRole
+apiVersion: {{ .Values.rbac.apiVersion }}
+metadata:
+  name: {{ .Values.rbac.namecluster }}
+rules: {{- range .Values.rules }}
+            - apiGroups: {{ .apiGroups }}
+              resources: {{ .resources }}
+              verbs: {{ .verbs }}
+          {{- end }}
+---
+kind: ClusterRoleBinding
+apiVersion: {{ .Values.rbac.apiVersion }}
+metadata:
+  name: {{ .Values.rbac.nameclusterB }}
+subjects:
+  - kind: {{ .Values.subjects.kind }}
+    name: {{ .Values.subjects.name }}
+    namespace: {{ .Values.subjects.namespace }}
+roleRef:
+  kind: {{ .Values.roleRef.kind }}
+  name: {{ .Values.roleRef.name }}
+  apiGroup: {{ .Values.roleRef.apiGroup }}
+---
+kind: Role
+apiVersion: {{ .Values.rbac.apiVersion }}
+metadata:
+  name: {{ .Values.rbac.namerole }}
+rules: {{- range .Values.rulesRole }}
+            - apiGroups: {{ .apiGroups }}
+              resources: {{ .resources }}
+              verbs: {{ .verbs }}
+          {{- end }}
+
+---
+kind: RoleBinding
+apiVersion: {{ .Values.rbac.apiVersion }}
+metadata:
+  name: {{ .Values.rbac.nameRoleBiding }}
+subjects:
+  - kind: {{ .Values.subjects.kind }}
+    name: {{ .Values.subjects.name }}
+    namespace: {{ .Values.subjects.namespace }}
+roleRef:
+  kind: {{ .Values.roleRefrole.kind }}
+  name: {{ .Values.roleRefrole.name }}
+  apiGroup: {{ .Values.roleRefrole.apiGroup }}

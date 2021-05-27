@@ -1,0 +1,82 @@
+
+#Deployement
+name: nfs-client-provisioner
+labels:
+  app: nfs-client-provisioner
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    app: nfs-client-provisioner
+  template:
+    app: nfs-client-provisioner
+  serviceAccountName: nfs-client-provisioner
+
+containers:
+  name: nfs-client-provisioner
+  image: gcr.io/k8s-staging-sig-storage/nfs-subdir-external-provisioner:v4.0.1
+volumeMounts:
+  - name: nfs-client-root
+    mountPath: /persistentvolumes
+env:
+  - name: PROVISIONER_NAME
+    value: k8s-sigs.io/nfs-subdir-external-provisioner
+  - name: NFS_SERVER
+    value: nas.rabat.sqli.com
+  - name: NFS_PATH
+    value: /K8S
+volumes:
+  - name: nfs-client-root
+    nfs:
+      server: nas.rabat.sqli.com
+      path: /K8S
+
+#class
+class:
+  name: managed-nfs-storage
+  provisioner: k8s-sigs.io/nfs-subdir-external-provisioner
+  archiveOnDelete: false
+
+
+#rbac
+rbac:
+  name: nfs-client-provisioner
+  apiVersion: rbac.authorization.k8s.io/v1
+  namecluster: nfs-client-provisioner-runner
+  nameclusterB: run-nfs-client-provisioner
+  namerole: leader-locking-nfs-client-provisioner
+  nameRoleBiding: leader-locking-nfs-client-provisioner
+subjects:
+  kind: ServiceAccount
+  name: nfs-client-provisioner
+  namespace: default
+roleRef:
+  kind: ClusterRole
+  name: nfs-client-provisioner-runner
+  apiGroup: rbac.authorization.k8s.io
+
+roleRefrole:
+  kind: Role
+  name: leader-locking-nfs-client-provisioner
+  apiGroup: rbac.authorization.k8s.io
+
+rules:
+  - apiGroups: ['""']
+    resources: ['"persistentvolumes"']
+    verbs: ['"get", "list", "watch", "create", "delete"']
+  - apiGroups: ['""']
+    resources: ['"persistentvolumeclaims"']
+    verbs: ['"get", "list", "watch", "update"']
+  - apiGroups: ['"storage.k8s.io"']
+    resources: ['"storageclasses"']
+    verbs: ['"get", "list", "watch"']
+  - apiGroups: ['""']
+    resources: ['"events"']
+    verbs: ['"create", "update", "patch"']
+
+
+rulesRole:
+  - apiGroups: ['""']
+    resources: ['"endpoints"']
+    verbs: ['"get", "list", "watch", "create", "update", "patch"']

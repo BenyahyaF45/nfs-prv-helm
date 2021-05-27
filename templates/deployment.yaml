@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Values.name }}
+  labels:
+    app: {{ .Values.labels.app }}
+spec:
+  replicas: {{ .Values.spec.replicas }}
+  strategy:
+    type: {{ .Values.spec.strategy.type }}
+  selector:
+    matchLabels:
+      app: {{ .Values.spec.selector.app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Values.spec.template.app }}
+    spec:
+      serviceAccountName: {{ .Values.spec.serviceAccountName }}
+      containers:
+        - name: {{ .Values.containers.name }}
+          image: {{ .Values.containers.image }}
+          volumeMounts: {{- range .Values.volumeMounts }}
+            - mountPath: {{ .mountPath }}
+              name: {{ .name }}
+          {{- end }}
+          env: {{- range .Values.env }}
+            - name: {{ .name }}
+              value: {{ .value }}
+          {{- end }}
+      volumes: {{- range .Values.volumes }}
+         - name: {{ .name }}
+           nfs:
+             server: {{ .nfs.server }}
+             path: {{ .nfs.path }}
+      {{- end }}
